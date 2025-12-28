@@ -5,6 +5,7 @@ import Config from "./config/config.js";
 import { mockFetchPatients } from "../../mock/mockFetch.js";
 import Calls from "../calls.js";
 import UpdateMedicalRecordButton from "./update-medical-record-button.js";
+import { useuserData } from "../core/spa";
 //@@viewOff:imports
 
 //@@viewOn:css
@@ -32,29 +33,31 @@ const MyMedicalRecordTile = createVisualComponent({
   propTypes: {},
   //@@viewOff:propTypes
 
-  render(props) {
-    const [patient, setPatient] = useState(undefined);
-    const uuId = useSession().identity.uuIdentity
-    console.log("uuId from session:", uuId);
-    useEffect(() => {
-      async function fetchPatient() {
-        try {
-          const loggedInPatientEmail = "jess.davis@college.edu";
+  render({ userData }) {
+    //const [patient, setPatient] = useState(undefined);
+    // const uuId = useSession().identity.uuIdentity
+    // console.log("uuId from session:", uuId);
+    // useEffect(() => {
+    //   async function fetchPatient() {
+    //     try {
+    //       const loggedInPatientEmail = "jess.davis@college.edu";
 
-          const response = await Calls.findPatient({ uuIdentity: uuId });
-          console.log("BE Patient:", response);
-          const patientData = response.itemList?.[0] ?? null;
-          setPatient(patientData ?? null);
-        } catch (error) {
-          console.error("Error fetching patient:", error);
-          setPatient(null);
-        }
-      }
+    //       const response = await Calls.findPatient({ uuIdentity: uuId });
+    //       console.log("BE Patient:", response);
+    //       const userData = response.itemList?.[0] ?? null;
+    //       setPatient(userData ?? null);
+    //     } catch (error) {
+    //       console.error("Error fetching patient:", error);
+    //       setPatient(null);
+    //     }
+    //   }
 
-      fetchPatient();
-    }, []);
+    //   fetchPatient();
+    // }, []);
 
-    console.log("Patient from state:", patient);
+    let patient = userData?.itemList?.[0];
+    const uuId = patient.uuIdentity;
+
     if (patient === undefined) {
       return <Uu5Elements.Text>Loading medical record...</Uu5Elements.Text>;
     }
@@ -62,10 +65,15 @@ const MyMedicalRecordTile = createVisualComponent({
       return <Uu5Elements.Text colorScheme="negative">Patient not found.</Uu5Elements.Text>;
     }
 
-    console.log("Logged-in patient ID:", patient);
+    // const handlePatientUpdate = async () => {
+    //   const response = await Calls.findPatient({ uuIdentity: uuId });
+    //   patient = response.itemList?.[0] ?? null; // Re-fetch and update patient data
+    // };
+
+    // console.log("Logged-in patient ID:", patient);
 
     const itemList = [
-      { title: patient.gender.charAt(0).toUpperCase()+patient.gender.slice(1), subtitle: "Gender" },
+      { title: patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1), subtitle: "Gender" },
       { title: Math.floor((Date.now() - new Date(patient.dateOfBirth)) / 31557600000), subtitle: "Age" },
       {
         title: (
@@ -112,7 +120,7 @@ const MyMedicalRecordTile = createVisualComponent({
         title: (
           <Uu5Elements.Grid>
             {patient.insuranceProvider?.length > 0 ? (
-                <Uu5Elements.Text> {patient.insuranceProvider} </Uu5Elements.Text>
+              <Uu5Elements.Text> {patient.insuranceProvider} </Uu5Elements.Text>
             ) : (
               <Uu5Elements.Text>No insurance provider specified</Uu5Elements.Text>
             )}
@@ -124,7 +132,7 @@ const MyMedicalRecordTile = createVisualComponent({
         title: (
           <Uu5Elements.Grid>
             {patient.emergencyContact?.length > 0 ? (
-                <Uu5Elements.Text> {patient.emergencyContact} </Uu5Elements.Text>
+              <Uu5Elements.Text> {patient.emergencyContact} </Uu5Elements.Text>
             ) : (
               <Uu5Elements.Text>No emergency contact specified</Uu5Elements.Text>
             )}
@@ -137,14 +145,18 @@ const MyMedicalRecordTile = createVisualComponent({
     return (
       <Uu5Elements.Block
         header={
-          <Uu5Elements.Grid display="inline" templateColumns = "repeat(2, 1fr)" columnGap = {8}>
+          <Uu5Elements.Grid display="inline" templateColumns="repeat(2, 1fr)" columnGap={8}>
             <Uu5Elements.InfoGroup
               itemList={[
                 { title: patient.firstName + " " + patient.lastName, subtitle: "Name", icon: "uugds-account" },
               ]}
               size="xl"
             />
-            <UpdateMedicalRecordButton uuId = {uuId} patient={patient} setPatient={setPatient} />
+            <UpdateMedicalRecordButton
+              uuId={uuId}
+              patient={patient}
+              /*onPatientUpdate={handlePatientUpdate}*/ /*setPatient={setPatient} */
+            />
           </Uu5Elements.Grid>
         }
         headerSeparator={true}

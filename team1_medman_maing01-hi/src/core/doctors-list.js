@@ -13,7 +13,7 @@ const Css = {};
 const DoctorsList = createVisualComponent({
   uu5Tag: Config.TAG + "DoctorsList",
 
-  render() {
+  render({ userData }) {
     const [route] = useRoute();
     const search = route.params?.search?.toLowerCase() || "";
     const [data, setData] = useState([]);
@@ -39,6 +39,8 @@ const DoctorsList = createVisualComponent({
 
       setError(null);
 
+      //console.log("Patient:", patient.id);
+
       const dtoIn = search ? { specialization: search } : {};
 
       Calls.findDoctors(dtoIn)
@@ -63,13 +65,12 @@ const DoctorsList = createVisualComponent({
         </Uu5Elements.HighlightedBox>
       );
     }
+    //console.log("userData:", userData);
 
     return (
       <Uu5Tiles.ControllerProvider data={data}>
         <Uu5TilesElements.Grid tileMinWidth={100} tileMaxWidth={400}>
-          {({ data }) => (
-            <DoctorTile key={data.id} doctor={data}/>
-          )}
+          {({ data }) => <DoctorTile key={data.id} doctor={data} userData={userData} />}
         </Uu5TilesElements.Grid>
       </Uu5Tiles.ControllerProvider>
     );

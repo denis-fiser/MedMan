@@ -107,7 +107,7 @@ const DoctorAppointmentDetailModal = createVisualComponent({
           id: appointment.id,
           note: note.trim(),
         });
-        console.log("updated appointment", appointment.id)
+        console.log("updated appointment", appointment.id);
         addAlert({
           message: `Note added successfully!`,
           priority: "success",
@@ -168,9 +168,7 @@ const DoctorAppointmentDetailModal = createVisualComponent({
                   <Uu5Elements.Text category="interface" segment="title" type="common">
                     {appointment.patient?.firstName} {appointment.patient?.lastName}
                   </Uu5Elements.Text>
-                  {appointment.patient?.emailAddress && (
-                    <div>Email: {appointment.patient.emailAddress}</div>
-                  )}
+                  {appointment.patient?.emailAddress && <div>Email: {appointment.patient.emailAddress}</div>}
                 </>
               ),
             },
@@ -198,7 +196,7 @@ const DoctorAppointmentDetailModal = createVisualComponent({
         />
 
         {/* Note Section */}
-        { appointment.status === "Completed" && (
+        {appointment.status === "Completed" && (
           <div className={Css.noteSection()}>
             <Uu5Elements.Text category="interface" segment="title" type="micro" style={{ marginBottom: "8px" }}>
               Add/Update Note:

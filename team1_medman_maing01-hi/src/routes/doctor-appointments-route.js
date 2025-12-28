@@ -26,6 +26,7 @@ let DoctorAppointmentsRoute = createVisualComponent({
   //@@viewOff:statics
 
   render(props) {
+    const { userData } = props;
     const attrs = Utils.VisualComponent.getAttrs(props);
 
     return (
@@ -34,7 +35,6 @@ let DoctorAppointmentsRoute = createVisualComponent({
           contentMap={{
             content: (
               <Uu5Elements.Block
-
                 header={
                   <Uu5Elements.Text category="story" segment="heading" type="h4">
                     My Schedule
@@ -42,7 +42,7 @@ let DoctorAppointmentsRoute = createVisualComponent({
                 }
                 headerSeparator={true}
               >
-                <DoctorAppointmentsList />
+                <DoctorAppointmentsList userData={userData} />
               </Uu5Elements.Block>
             ),
           }}

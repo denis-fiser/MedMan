@@ -10,7 +10,7 @@ const UpdateMedicalRecordModal = createVisualComponent({
 
   propTypes: {},
 
-  render({ open, onClose, patient, setPatient, uuId }) {
+  render({ open, onClose, patient, /*setPatient,*/ uuId }) {
     const alertBus = Uu5Elements.useAlertBus();
 
     const [medications, setMedications] = useState(patient.medicalRecord?.medications?.join(", ") || "");
@@ -20,6 +20,8 @@ const UpdateMedicalRecordModal = createVisualComponent({
     const [emergencyContact, setEmergencyContact] = useState(patient.emergencyContact);
     // Sending updated data to backend
     console.log("patientID:", patient.id);
+    console.log("patientIdentity:", patient.uuIdentity);
+
     async function handleSubmit() {
       try {
         const updatedData = {
@@ -32,7 +34,7 @@ const UpdateMedicalRecordModal = createVisualComponent({
             illnesses: (illnesses || "")
               .split(",")
               .map((i) => i.trim())
-              .filter(Boolean)
+              .filter(Boolean),
           },
           allergies: (allergies || "")
             .split(",")
@@ -41,18 +43,24 @@ const UpdateMedicalRecordModal = createVisualComponent({
           insuranceProvider: (insuranceProvider ?? "").trim() || null,
           emergencyContact: (emergencyContact ?? "").trim() || null,
         };
-        console.log("updated Data", updatedData)
+        console.log("updated Data", updatedData);
         await Calls.updatePatient(updatedData);
 
         alertBus.addAlert({
           message: "Medical record updated successfully.",
           priority: "success",
         });
+
+        // Notify the parent to re-fetch the patient data
+        // if (typeof onPatientUpdate === "function") {
+        //   onPatientUpdate();
+        // }
         onClose();
 
         //Updating displayed data
-        const response = await Calls.findPatient({ uuIdentity: uuId });
-        setPatient(response.itemList?.[0] ?? null);
+        //const response = await Calls.findPatient({ uuIdentity: uuId });
+        //  setPatient(response.itemList?.[0] ?? null);
+        window.location.reload();
       } catch (error) {
         alertBus.addAlert({
           message: "Error updating medical record: " + error.message,
@@ -87,7 +95,11 @@ const UpdateMedicalRecordModal = createVisualComponent({
           <Uu5Forms.Text.Input width="100%" value={illnesses} onChange={(opt) => setIllnesses(opt.data.value)} />
 
           <Uu5Elements.Label>Insurance Provider</Uu5Elements.Label>
-          <Uu5Forms.Text.Input width="100%" value={insuranceProvider} onChange={(opt) => setInsuranceProvider(opt.data.value)} />
+          <Uu5Forms.Text.Input
+            width="100%"
+            value={insuranceProvider}
+            onChange={(opt) => setInsuranceProvider(opt.data.value)}
+          />
 
           <Uu5Elements.Label>Emergency Contact</Uu5Elements.Label>
           <Uu5Forms.Text.Input

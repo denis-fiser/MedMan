@@ -11,9 +11,10 @@ const BookAppointmentModal = createVisualComponent({
   propTypes: {
     onClose: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
+    userData: PropTypes.object, // Logged-in patient data
   },
 
-  render({ open, onClose }) {
+  render({ open, onClose, userData }) {
     const [doctors, setDoctors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedSpecialization, setSelectedSpecialization] = useState("");
@@ -25,14 +26,13 @@ const BookAppointmentModal = createVisualComponent({
     const errorMessages = {
       "team1-medman-main/appointment/create/appointmentDoesNotFit":
         "Sorry, the time is too close to the doctor's availability end.",
-      "team1-medman-main/appointment/create/timeSlotNotAvailable":
-        "Oops! Someone just booked this slot.",
+      "team1-medman-main/appointment/create/timeSlotNotAvailable": "Oops! Someone just booked this slot.",
       "team1-medman-main/appointment/create/appointmentCollision":
         "This time is already booked. Please pick another slot.",
     };
-
+    console.log("User Data in Modal Book:", userData);
     // Fetch logged-in patient ID
-    const uuId = useSession.identity?.uuIdentity
+    const uuId = useSession.identity?.uuIdentity;
     useEffect(() => {
       const fetchPatientId = async () => {
         try {
@@ -82,9 +82,7 @@ const BookAppointmentModal = createVisualComponent({
         return;
       }
 
-      const doctor = filteredDoctors.find(
-        (doc) => `${doc.lastName} ${doc.firstName}` === selectedDoctor
-      );
+      const doctor = filteredDoctors.find((doc) => `${doc.lastName} ${doc.firstName}` === selectedDoctor);
       if (!doctor) return;
 
       const loadAndFilterSlots = async () => {
@@ -102,10 +100,7 @@ const BookAppointmentModal = createVisualComponent({
               if (appointment.status === "Cancelled") return false;
               if (appointment.doctorId !== doctor.id) return false;
               const appointmentTime = new Date(appointment.dateTime);
-              return (
-                appointmentTime >= slotStart &&
-                appointmentTime < slotEnd
-              );
+              return appointmentTime >= slotStart && appointmentTime < slotEnd;
             });
 
             return !isBooked;
@@ -130,7 +125,7 @@ const BookAppointmentModal = createVisualComponent({
       const slot = availableTimeSlots.find(
         (slot) =>
           `${new Date(slot.start).toLocaleString()} - ${new Date(slot.end).toLocaleString()}` ===
-          formData.appointmentTimeSlot
+          formData.appointmentTimeSlot,
       );
 
       const dtoIn = {
@@ -152,9 +147,7 @@ const BookAppointmentModal = createVisualComponent({
         onClose();
       } catch (err) {
         console.error(err);
-        const code = err?.dtoOut?.uuAppErrorMap
-          ? Object.keys(err.dtoOut.uuAppErrorMap)[0]
-          : null;
+        const code = err?.dtoOut?.uuAppErrorMap ? Object.keys(err.dtoOut.uuAppErrorMap)[0] : null;
         addAlert({
           header: "Appointment wasn't created.",
           message: errorMessages[code] || "Unable to create appointment. Please try again.",
@@ -170,7 +163,11 @@ const BookAppointmentModal = createVisualComponent({
       <Uu5Elements.Modal
         open={open}
         onClose={onClose}
-        header={<Uu5Elements.Text category="interface" segment="title" type="major">Please fill in this form</Uu5Elements.Text>}
+        header={
+          <Uu5Elements.Text category="interface" segment="title" type="major">
+            Please fill in this form
+          </Uu5Elements.Text>
+        }
       >
         <Uu5Forms.Form onSubmit={handleSubmit}>
           <Uu5Forms.FormSelect
@@ -185,7 +182,11 @@ const BookAppointmentModal = createVisualComponent({
             name="doctor"
             required
             disabled={!selectedSpecialization}
-            itemList={loading ? [{ value: "Loading..." }] : filteredDoctors.map((d) => ({ value: `${d.lastName} ${d.firstName}` }))}
+            itemList={
+              loading
+                ? [{ value: "Loading..." }]
+                : filteredDoctors.map((d) => ({ value: `${d.lastName} ${d.firstName}` }))
+            }
             onChange={(e) => setSelectedDoctor(e.data.value)}
           />
           <Uu5Forms.FormSelect
@@ -193,11 +194,12 @@ const BookAppointmentModal = createVisualComponent({
             name="appointmentTimeSlot"
             required
             disabled={!selectedDoctor}
-            itemList={availableTimeSlots.length === 0
-              ? [{ value: "No free slots available" }]
-              : availableTimeSlots.map((slot) => ({
-                value: `${new Date(slot.start).toLocaleString()} - ${new Date(slot.end).toLocaleString()}`,
-              }))
+            itemList={
+              availableTimeSlots.length === 0
+                ? [{ value: "No free slots available" }]
+                : availableTimeSlots.map((slot) => ({
+                    value: `${new Date(slot.start).toLocaleString()} - ${new Date(slot.end).toLocaleString()}`,
+                  }))
             }
           />
           <Uu5Forms.SubmitButton disabled={loading || availableTimeSlots.length === 0}>

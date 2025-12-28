@@ -57,17 +57,16 @@ const DoctorAvailabilityModal = createVisualComponent({
         }),
       ),
     }),
-    clinicName: PropTypes.string
-
+    clinicName: PropTypes.string,
+    userData: PropTypes.object,
   },
   //@@viewOff:propTypes
 
-  render({ open, onClose, doctor }) {
+  render({ open, onClose, doctor, userData }) {
     const [bookAppointmentModalOpen, setBookAppointmentModalOpen] = useState(false);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
     const [appointments, setAppointments] = useState([]);
     const [loadingAppointments, setLoadingAppointments] = useState(false);
-
 
     const handleBookClick = (timeSlot) => {
       setSelectedTimeSlot(timeSlot);
@@ -96,7 +95,8 @@ const DoctorAvailabilityModal = createVisualComponent({
 
       return `${startStr} - ${endTime}`;
     };
-    console.log("doctor", doctor.id)
+    // console.log("doctor", doctor.id)
+    //console.log("userDataavailability", userData);
     useEffect(() => {
       if (!open || !doctor?.id) return;
 
@@ -111,12 +111,11 @@ const DoctorAvailabilityModal = createVisualComponent({
         } finally {
           setLoadingAppointments(false);
         }
-        console.log("appointments", appointments)
+        console.log("appointments", appointments);
       };
 
       fetchAppointments();
     }, [open, doctor.id]);
-
 
     // Filter available time slots
     const now = new Date();
@@ -137,10 +136,7 @@ const DoctorAvailabilityModal = createVisualComponent({
         const appointmentTime = new Date(appointment.dateTime);
 
         // appointment falls inside slot
-        return (
-          appointmentTime >= slotStart &&
-          appointmentTime < slotEnd
-        );
+        return appointmentTime >= slotStart && appointmentTime < slotEnd;
       });
 
       return !isBooked;
@@ -192,6 +188,7 @@ const DoctorAvailabilityModal = createVisualComponent({
           onClose={() => setBookAppointmentModalOpen(false)}
           doctorId={doctor.id}
           timeSlot={selectedTimeSlot}
+          userData={userData}
         />
       </>
     );

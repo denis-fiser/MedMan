@@ -99,7 +99,6 @@ const SPECIALIZATIONS = [
   { value: "Ophthalmology", children: "Ophthalmology" },
   { value: "Obstetrics and Gynecology", children: "Obstetrics and Gynecology" },
   { value: "Emergency Medicine", children: "Emergency Medicine" },
-
 ];
 
 const CLINICS = [
@@ -185,7 +184,7 @@ const AddDoctorView = ({ onBack, onSuccess }) => {
     description: null,
     profilePhoto: null,
   });
-  console.log(formData)
+  console.log(formData);
   const { addAlert } = useAlertBus();
   const handleSubmit = async () => {
     setLoading(true);
@@ -194,11 +193,11 @@ const AddDoctorView = ({ onBack, onSuccess }) => {
         ...formData,
         //name: `${formData.firstName} ${formData.lastName}`,
       });
-      addAlert({message: "Doctor created successfully!", priority:"success"});
+      addAlert({ message: "Doctor created successfully!", priority: "success" });
       onSuccess();
       onBack();
     } catch (err) {
-      addAlert({message:err.message || "Failed to create doctor", priority:"error"});
+      addAlert({ message: err.message || "Failed to create doctor", priority: "error" });
     } finally {
       setLoading(false);
     }
@@ -210,12 +209,7 @@ const AddDoctorView = ({ onBack, onSuccess }) => {
 
   return (
     <div className={Css.container()}>
-      <Uu5Elements.Button
-        className={Css.backButton()}
-        icon="mdi-arrow-left"
-        onClick={onBack}
-        significance="subdued"
-      >
+      <Uu5Elements.Button className={Css.backButton()} icon="mdi-arrow-left" onClick={onBack} significance="subdued">
         Back
       </Uu5Elements.Button>
 
@@ -345,14 +339,18 @@ const RemoveDoctorView = ({ onBack, onSuccess }) => {
     setLoading(true);
     try {
       await Calls.removeDoctor({ id: selectedDoctor });
-      addAlert({message: "Doctor removed successfully!", priority: "success"});
+      addAlert({ message: "Doctor removed successfully!", priority: "success" });
       onSuccess();
       onBack();
     } catch (err) {
       if (err.message?.includes("active appointments")) {
-        addAlert({message:"Cannot remove this doctor. They have active appointments. Please cancel or reassign those appointments first.", priority:"warning"});
+        addAlert({
+          message:
+            "Cannot remove this doctor. They have active appointments. Please cancel or reassign those appointments first.",
+          priority: "warning",
+        });
       } else {
-        addAlert({message: err.message || "Failed to remove doctor", priority:"error"});
+        addAlert({ message: err.message || "Failed to remove doctor", priority: "error" });
       }
     } finally {
       setLoading(false);
@@ -362,12 +360,7 @@ const RemoveDoctorView = ({ onBack, onSuccess }) => {
 
   return (
     <div className={Css.container()}>
-      <Uu5Elements.Button
-        className={Css.backButton()}
-        icon="mdi-arrow-left"
-        onClick={onBack}
-        significance="subdued"
-      >
+      <Uu5Elements.Button className={Css.backButton()} icon="mdi-arrow-left" onClick={onBack} significance="subdued">
         Back
       </Uu5Elements.Button>
 
@@ -415,8 +408,8 @@ const RemoveDoctorView = ({ onBack, onSuccess }) => {
           <>
             <p>Are you sure you want to remove this doctor?</p>
             <p style={{ fontSize: "13px", color: "#666", marginTop: "8px" }}>
-              Note: If this doctor has active appointments, they must be cancelled first.
-              Past appointments will remain in the system.
+              Note: If this doctor has active appointments, they must be cancelled first. Past appointments will remain
+              in the system.
             </p>
           </>
         }
@@ -457,11 +450,11 @@ const UpdateDoctorView = ({ onBack, onSuccess }) => {
     try {
       const result = await Calls.findDoctors({});
       console.log(
-        result.itemList.map(d => ({
+        result.itemList.map((d) => ({
           id: d.id,
           oid: d.oid,
           doctorId: d.doctorId,
-        }))
+        })),
       );
       setDoctors(result.itemList || []);
     } catch (err) {
@@ -501,19 +494,19 @@ const UpdateDoctorView = ({ onBack, onSuccess }) => {
   };
   const handleUpdate = async () => {
     setLoading(true);
-    console.log(formData)
-    console.log(selectedDoctorId)
-    console.log(doctors)
+    console.log(formData);
+    console.log(selectedDoctorId);
+    console.log(doctors);
     try {
       await Calls.updateDoctor({
         id: selectedDoctorId,
         ...formData,
       });
-      addAlert({message: "Doctor updated successfully!", priority: "success"});
+      addAlert({ message: "Doctor updated successfully!", priority: "success" });
       onSuccess();
       onBack();
     } catch (err) {
-      addAlert({message: err.message || "Failed to update doctor", priority: "error"});
+      addAlert({ message: err.message || "Failed to update doctor", priority: "error" });
     } finally {
       setLoading(false);
     }
@@ -521,12 +514,7 @@ const UpdateDoctorView = ({ onBack, onSuccess }) => {
 
   return (
     <div className={Css.container()}>
-      <Uu5Elements.Button
-        className={Css.backButton()}
-        icon="mdi-arrow-left"
-        onClick={onBack}
-        significance="subdued"
-      >
+      <Uu5Elements.Button className={Css.backButton()} icon="mdi-arrow-left" onClick={onBack} significance="subdued">
         Back
       </Uu5Elements.Button>
 
@@ -658,9 +646,7 @@ let ManageDoctorsRoute = createVisualComponent({
       <>
         <RouteBar />
         {currentView === "menu" && <MainMenuView onNavigate={setCurrentView} />}
-        {currentView === "add" && (
-          <AddDoctorView onBack={() => setCurrentView("menu")} onSuccess={handleSuccess} />
-        )}
+        {currentView === "add" && <AddDoctorView onBack={() => setCurrentView("menu")} onSuccess={handleSuccess} />}
         {currentView === "remove" && (
           <RemoveDoctorView onBack={() => setCurrentView("menu")} onSuccess={handleSuccess} />
         )}
@@ -672,7 +658,7 @@ let ManageDoctorsRoute = createVisualComponent({
   },
 });
 
-ManageDoctorsRoute = withRoute(ManageDoctorsRoute, { authenticated: true } );
+ManageDoctorsRoute = withRoute(ManageDoctorsRoute, { authenticated: true });
 
 //@@viewOn:exports
 export { ManageDoctorsRoute };

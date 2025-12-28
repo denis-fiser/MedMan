@@ -1,4 +1,4 @@
-import { createVisualComponent, useState } from "uu5g05";
+import { createVisualComponent, useState, PropTypes } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "./config/config.js";
 import BookAppointmentModal from "./book-appointment-modal.js";
@@ -6,16 +6,17 @@ import BookAppointmentModal from "./book-appointment-modal.js";
 const Css = {
   main: () => Config.Css.css({}),
 
-  button: () =>
-    Config.Css.css({
-
-    }),
+  button: () => Config.Css.css({}),
 };
 
 const BookAppointmentButton = createVisualComponent({
   uu5Tag: Config.TAG + "BookAppointmentButton",
 
-  render: function () {
+  propTypes: {
+    userData: PropTypes.object, // Logged-in patient data
+  },
+
+  render({ userData }) {
     const [bookAppointmentModalOpen, setBookAppointmentModalOpen] = useState(false);
 
     const handleButtonClick = () => {
@@ -37,7 +38,7 @@ const BookAppointmentButton = createVisualComponent({
         <Uu5Elements.Button onClick={handleButtonClick} className={Css.button()} size="m" significance="highlighted">
           Create an Appointment
         </Uu5Elements.Button>
-        <BookAppointmentModal open={bookAppointmentModalOpen} onClose={handleModalClose} />
+        <BookAppointmentModal open={bookAppointmentModalOpen} onClose={handleModalClose} userData={userData} />
       </>
     );
   },

@@ -24,6 +24,7 @@ let DoctorsListRoute = createVisualComponent({
   //@@viewOff:statics
 
   render(props) {
+    const { userData } = props;
     const attrs = Utils.VisualComponent.getAttrs(props);
 
     return (
@@ -41,7 +42,7 @@ let DoctorsListRoute = createVisualComponent({
                 }
                 headerSeparator={true}
               >
-                <DoctorsList />
+                <DoctorsList userData={userData} />
               </Uu5Elements.Block>
             ),
           }}

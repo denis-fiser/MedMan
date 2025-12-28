@@ -42,6 +42,8 @@ let MyMedicalRecordRoute = createVisualComponent({
 
   render(props) {
     //@@viewOff:private`
+    const { userData } = props;
+    console.log("MyMedicalRecordRoute userData:", userData);
 
     //@@viewOn:render
     const attrs = Utils.VisualComponent.getAttrs(props);
@@ -53,7 +55,7 @@ let MyMedicalRecordRoute = createVisualComponent({
             header: <RouteBar />,
             content: (
               <div className={Css.headerWrapper()}>
-                <MyMedicalRecordTile />
+                <MyMedicalRecordTile userData={userData} />
               </div>
             ),
           }}

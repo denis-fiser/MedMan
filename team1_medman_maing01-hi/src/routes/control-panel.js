@@ -35,8 +35,11 @@ let ControlPanel = createVisualComponent({
 
   render(props) {
     //@@viewOn:private
+    const { userData } = props;
     const { state, data, errorData } = useDataObject({ handlerMap: { load: Calls.getWorkspace } });
     //@@viewOff:private
+
+    console.log("User data in control panel:", userData);
 
     //@@viewOn:render
     let child;
@@ -77,7 +80,7 @@ let ControlPanel = createVisualComponent({
       <>
         <RouteBar />
         {child}
-        <BookAppointmentButton />
+        <BookAppointmentButton userData={userData} />
       </>
     );
     //@@viewOff:render

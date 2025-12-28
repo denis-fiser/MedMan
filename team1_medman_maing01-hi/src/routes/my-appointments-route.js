@@ -41,6 +41,7 @@ let MyAppointmentsRoute = createVisualComponent({
 
   render(props) {
     //@@viewOff:private`
+    const { userData } = props;
 
     //@@viewOn:render
     const attrs = Utils.VisualComponent.getAttrs(props);
@@ -50,7 +51,11 @@ let MyAppointmentsRoute = createVisualComponent({
         <Uu5Elements.GridTemplate
           contentMap={{
             header: <RouteBar />,
-            content: <div className={Css.headerWrapper()}><AppointmentsList />  </div>,
+            content: (
+              <div className={Css.headerWrapper()}>
+                <AppointmentsList userData={userData} />{" "}
+              </div>
+            ),
           }}
           templateAreas={{
             xs: `header, content, sidebar, footer`,
@@ -63,7 +68,6 @@ let MyAppointmentsRoute = createVisualComponent({
           templateColumns={{ xs: "100%", m: "repeat(4, 1fr)" }}
           rowGap={8}
           columnGap={8}
-
         />
       </div>
     );

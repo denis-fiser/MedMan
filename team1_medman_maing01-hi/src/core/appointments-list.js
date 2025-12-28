@@ -12,7 +12,7 @@ const Css = {};
 const AppointmentsList = createVisualComponent({
   uu5Tag: Config.TAG + "AppointmentsList",
 
-  render() {
+  render({ userData }) {
     const [route] = useRoute();
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -33,6 +33,7 @@ const AppointmentsList = createVisualComponent({
 
     //modified to refresh after appointment cancellation or creation based on demo-data - appointments.json -> if without server, comment out and uncomment the above useEffect
 
+    const patientId = userData.itemList[0].id;
     useEffect(() => {
       fetchAppointments();
     }, []);
@@ -51,7 +52,7 @@ const AppointmentsList = createVisualComponent({
       setLoading(true);
       try {
         // Use the same data source as Past Appointments page
-        const dtoOut = await Calls.findAppointments({patientId: "PAT-1001"});
+        const dtoOut = await Calls.findAppointments({ patientId: patientId });
         setAppointments(Array.isArray(dtoOut.itemList) ? dtoOut.itemList : []);
         console.log("Fetched appointments:", dtoOut);
       } catch (err) {

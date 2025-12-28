@@ -5,8 +5,6 @@ import Plus4U5App from "uu_plus4u5g02-app";
 import Config from "./config/config.js";
 import SearchBar from "./search-bar.js";
 import BookAppointmentModal from "../core/book-appointment-modal.js";
-import BookAppointmentButton from "../core/book-appointment-button.js";
-import importLsi from "../lsi/import-lsi.js";
 
 //@@viewOff:imports
 
@@ -20,15 +18,17 @@ const Css = {
       margin: "0px",
     }),
 
-  searchForm: () => Config.Css.css({
-    paddingRight: "5px"
-  }),
+  searchForm: () =>
+    Config.Css.css({
+      paddingRight: "5px",
+    }),
 
   textInput: () => Config.Css.css({}),
 
-  button: () => Config.Css.css({
-    margin: "0px",
-  }),
+  button: () =>
+    Config.Css.css({
+      margin: "0px",
+    }),
 };
 //@@viewOff:css
 
@@ -51,7 +51,6 @@ const RouteBar = createVisualComponent({
   //@@viewOff:defaultProps
 
   render(props) {
-
     //@@viewOn:private
     const [route, setRoute] = useRoute();
     const [bookAppointmentModalOpen, setBookAppointmentModalOpen] = useState(false);
@@ -71,10 +70,8 @@ const RouteBar = createVisualComponent({
         onClick: () => setBookAppointmentModalOpen(true),
       },
       {
-        children: <SearchBar query={query} setQuery={setQuery} onSearch={handleSearch}/>,
+        children: <SearchBar query={query} setQuery={setQuery} onSearch={handleSearch} />,
         className: Css.searchForm(),
-
-
       },
       {
         children: "Search",
@@ -82,7 +79,7 @@ const RouteBar = createVisualComponent({
         significance: "highlighted",
         colorScheme: "neutral",
         onClick: handleSearch,
-      }
+      },
     ];
     const ITEM_LIST = [
       { code: "myAppointments", label: "My Appointments", href: "myAppointments" },
@@ -103,18 +100,13 @@ const RouteBar = createVisualComponent({
     //@@viewOn:render
     return (
       <>
-        <Plus4U5App.PositionBar view = "short" actionList={actionList} itemList={ITEM_LIST} activeItem={activeItemCode} />
+        <Plus4U5App.PositionBar view="short" actionList={actionList} itemList={ITEM_LIST} activeItem={activeItemCode} />
 
-        {/* Book Appointment Modal */}
-        <BookAppointmentModal
-          open={bookAppointmentModalOpen}
-          onClose={() => setBookAppointmentModalOpen(false)}
-        />
+        <BookAppointmentModal open={bookAppointmentModalOpen} onClose={() => setBookAppointmentModalOpen(false)} />
       </>
     );
- },
+  },
 });
-
 
 //@@viewOn:exports
 export { RouteBar };

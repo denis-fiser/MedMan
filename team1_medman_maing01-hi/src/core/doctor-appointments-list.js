@@ -39,7 +39,7 @@ const DoctorAppointmentsList = createVisualComponent({
   uu5Tag: Config.TAG + "DoctorAppointmentsList",
   //@@viewOff:statics
 
-  render() {
+  render({ userData }) {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -60,18 +60,21 @@ const DoctorAppointmentsList = createVisualComponent({
       return () => window.removeEventListener("appointmentsUpdated", updateHandler);
     }, []);
 
+    const doctorId = userData.itemList[0].id;
+
+    console.log("Doctor ID:", doctorId);
+
     async function fetchAppointments() {
       setLoading(true);
       try {
         //Using Mock data uncomment bellow
         //const json = await getAppointmentsWithDetails();
 
-        const doctorId = "DOC-001" //Replace with logged in doctor logic
+        // const doctorId = "DOC-001"; //Replace with logged in doctor logic
         //Backend Call, comment when mocking
         Calls.findAppointments({ doctorId: doctorId }).then((dtoOut) => {
           setAppointments(Array.isArray(dtoOut.itemList) ? dtoOut.itemList : []);
-        }
-        )
+        });
         //Using Mock data uncomment bellow
         //setAppointments(json);
       } catch (err) {
@@ -129,9 +132,7 @@ const DoctorAppointmentsList = createVisualComponent({
 
     // Filter appointments by date (showing all status types)
     const filteredAppointments = filterAppointmentsByDate(appointments);
-    const uniqueAppointments = Array.from(
-      new Map(filteredAppointments.map(a => [a.id, a])).values()
-    );
+    const uniqueAppointments = Array.from(new Map(filteredAppointments.map((a) => [a.id, a])).values());
 
     // Group appointments by status
     const createdAppointments = uniqueAppointments.filter((a) => a.status === "Created");

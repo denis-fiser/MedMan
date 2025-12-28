@@ -5,7 +5,6 @@ import Uu5Elements from "uu5g05-elements";
 import Config from "./config/config.js";
 import importLsi from "../lsi/import-lsi.js";
 
-
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -45,24 +44,46 @@ let WelcomeIntersection = createVisualComponent({
     const [route, setRoute] = useRoute();
     const attrs = Utils.VisualComponent.getAttrs(props);
     const actionListPatient = [
-      { children: "Go to patient", onClick: () =>setRoute("myAppointments"), colorScheme: "primary", significance: "highlighted" },
-    ]
+      {
+        children: "Go to patient",
+        onClick: () => setRoute("myAppointments"),
+        colorScheme: "primary",
+        significance: "highlighted",
+      },
+    ];
     const actionListDoctor = [
-      { children: "Go to doctor", onClick: () =>setRoute("doctorAppointments"), colorScheme: "primary", significance: "highlighted" },
-    ]
+      {
+        children: "Go to doctor",
+        onClick: () => setRoute("doctorAppointments"),
+        colorScheme: "primary",
+        significance: "highlighted",
+      },
+    ];
     return (
       <div {...attrs} className={Css.headerWrapper()}>
         <Uu5Elements.GridTemplate
           justifyItems="center"
           contentMap={{
-            header: <Uu5Elements.Text category="story" segment="heading" type="h1">Welcome to MedMan</Uu5Elements.Text>,
+            header: (
+              <Uu5Elements.Text category="story" segment="heading" type="h1">
+                Welcome to MedMan
+              </Uu5Elements.Text>
+            ),
             content: (
-
-                <Uu5Elements.Grid  justifyContent = "center" alignContent = "center" flow="column">
-                <Uu5Elements.PlaceholderBox code="female-user" actionList={actionListPatient} size = "m" colorScheme="primary"/>
-                <Uu5Elements.PlaceholderBox code="graduation-hat" actionList={actionListDoctor} size="m" colorScheme="positive" />
-                </Uu5Elements.Grid>
-
+              <Uu5Elements.Grid justifyContent="center" alignContent="center" flow="column">
+                <Uu5Elements.PlaceholderBox
+                  code="female-user"
+                  actionList={actionListPatient}
+                  size="m"
+                  colorScheme="primary"
+                />
+                <Uu5Elements.PlaceholderBox
+                  code="graduation-hat"
+                  actionList={actionListDoctor}
+                  size="m"
+                  colorScheme="positive"
+                />
+              </Uu5Elements.Grid>
             ),
           }}
           templateAreas={{
@@ -83,7 +104,7 @@ let WelcomeIntersection = createVisualComponent({
   },
 });
 
-WelcomeIntersection = withRoute(WelcomeIntersection, { authenticated: false });
+WelcomeIntersection = withRoute(WelcomeIntersection, { authenticated: true });
 
 //@@viewOn:exports
 export { WelcomeIntersection };

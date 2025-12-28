@@ -68,11 +68,13 @@ const DoctorTile = createVisualComponent({
       availableTimeSlots: PropTypes.array,
       clinicName: PropTypes.string,
     }).isRequired,
+    userData: PropTypes.object,
   },
   //@@viewOff:propTypes
 
   render: function (props) {
     const { doctor } = props;
+    const { userData } = props;
     const [availabilityModalOpen, setAvailabilityModalOpen] = useState(false);
 
     return (
@@ -85,9 +87,7 @@ const DoctorTile = createVisualComponent({
               className={Css.photo()}
             />
           ) : (
-            <div className={Css.noPhoto()} >
-              Picture unavailable
-            </div>
+            <div className={Css.noPhoto()}>Picture unavailable</div>
           )}
           <Uu5Elements.Text category="interface" segment="title" type="common">
             {doctor.firstName} {doctor.lastName}
@@ -120,6 +120,7 @@ const DoctorTile = createVisualComponent({
           open={availabilityModalOpen}
           onClose={() => setAvailabilityModalOpen(false)}
           doctor={doctor}
+          userData={userData}
         />
       </>
     );

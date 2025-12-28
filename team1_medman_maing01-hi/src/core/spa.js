@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Utils, useState, useEffect   } from "uu5g05";
+import { createVisualComponent, Utils, useState, useEffect, useContext } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Plus4U5 from "uu_plus4u5g02";
 import Plus4U5Elements from "uu_plus4u5g02-elements";
@@ -34,65 +34,35 @@ const ROUTE_ACCESS = {
   controlPanel: [ROLE.ADMIN],
 };
 
-function withRoleGuard(Component, allowedRoles, userRole) {
+function withRoleGuard(Component, allowedRoles, userRole, userData) {
   return (props) => {
     if (!allowedRoles || allowedRoles.includes(userRole)) {
-      return <Component {...props} />;
+      return <Component {...props} userData={userData} />;
     }
 
-    return (
-      <Plus4U5Elements.Unauthorized />
-    );
+    return <Plus4U5Elements.Unauthorized />;
   };
 }
-function createRouteMap(userRole) {
+function createRouteMap(userRole, userData) {
   return {
     "": { redirect: "welcomeIntersection" },
 
     home: (props) => <Home {...props} />,
 
-    "sys/uuAppWorkspace/initUve": (props) => (
-      <InitAppWorkspace {...props} />
-    ),
+    "sys/uuAppWorkspace/initUve": (props) => <InitAppWorkspace {...props} />,
 
-    myAppointments: withRoleGuard(
-      MyAppointmentsRoute,
-      ROUTE_ACCESS.myAppointments,
-      userRole
-    ),
+    myAppointments: withRoleGuard(MyAppointmentsRoute, ROUTE_ACCESS.myAppointments, userRole, userData),
 
-    doctorsList: withRoleGuard(
-      DoctorsListRoute,
-      ROUTE_ACCESS.doctorsList,
-      userRole
-    ),
+    doctorsList: withRoleGuard(DoctorsListRoute, ROUTE_ACCESS.doctorsList, userRole, userData),
 
-    myMedicalRecord: withRoleGuard(
-      MyMedicalRecordRoute,
-      ROUTE_ACCESS.myMedicalRecord,
-      userRole
-    ),
+    myMedicalRecord: withRoleGuard(MyMedicalRecordRoute, ROUTE_ACCESS.myMedicalRecord, userRole, userData),
 
-    doctorAppointments: withRoleGuard(
-      DoctorAppointmentsRoute,
-      ROUTE_ACCESS.doctorAppointments,
-      userRole
-    ),
+    doctorAppointments: withRoleGuard(DoctorAppointmentsRoute, ROUTE_ACCESS.doctorAppointments, userRole, userData),
 
-    controlPanel: withRoleGuard(
-      ControlPanel,
-      ROUTE_ACCESS.controlPanel,
-      userRole
-    ),
+    controlPanel: withRoleGuard(ControlPanel, ROUTE_ACCESS.controlPanel, userRole, userData),
 
-
-    manageDoctors: withRoleGuard(
-      ManageDoctorsRoute,
-      ROUTE_ACCESS.manageDoctors,
-      userRole
-
-    ),
-    welcomeIntersection: (props) =>  <WelcomeIntersectionRoute {...props}/>,
+    manageDoctors: withRoleGuard(ManageDoctorsRoute, ROUTE_ACCESS.manageDoctors, userRole),
+    welcomeIntersection: (props) => <WelcomeIntersectionRoute {...props} />,
 
     "*": () => (
       <Uu5Elements.Text category="story" segment="heading" type="h1">
@@ -121,15 +91,49 @@ const ROUTE_MAP = {
   ),
 };
 */
+
+async function fetchPatientData(uuId) {
+  const patientData = await calls.findPatient({ uuIdentity: uuId });
+  console.log("Patient data", patientData);
+  return patientData;
+}
+
+async function fetchDoctorData(uuId) {
+  const doctorData = await calls.findDoctors({ uuIdentity: uuId });
+  console.log("Doctor data", doctorData);
+  return doctorData;
+}
+
 async function resolveUserRole() {
   const identity = await calls.getPermission();
+  const uuId = identity?.uuIdentity;
+
+  console.log("identity", identity);
+  console.log("uuId", uuId);
 
   const profileList = identity?.profiles?.[0]?.profileList || [];
 
-  if (profileList.includes("Authorities")) return ROLE.ADMIN;
-  if (profileList.includes("Doctor")) return ROLE.DOCTOR;
+  console.log("profile list", profileList);
 
-  return ROLE.PATIENT;
+  let role = null; // Default role
+
+  switch (true) {
+    case profileList.includes("Patient"):
+      role = ROLE.PATIENT;
+      break;
+    case profileList.includes("Authorities"):
+      role = ROLE.ADMIN;
+      break;
+    case profileList.includes("Doctor"):
+      role = ROLE.DOCTOR;
+      break;
+    default:
+      console.warn("No matching role found. Defaulting to null.");
+      role = null; // Explicitly set to null if no match is found
+      break;
+  }
+
+  return { role, uuId };
 }
 //@@viewOff:constants
 
@@ -154,10 +158,29 @@ const Spa = createVisualComponent({
 
   render() {
     const [userRole, setUserRole] = useState(undefined);
+    const [userData, setUserData] = useState(null);
 
+    // useEffect(() => {
+    //   resolveUserRole()
+    //     .then(setUserRole)
+    //     .catch(() => setUserRole("error"));
+    // }, []);
     useEffect(() => {
       resolveUserRole()
-        .then(setUserRole)
+        .then(({ role, uuId }) => {
+          setUserRole(role);
+
+          if (uuId) {
+            if (role === ROLE.PATIENT && uuId) {
+              return fetchPatientData(uuId); //fetch patient data
+            } else if (role === ROLE.DOCTOR) {
+              return fetchDoctorData(uuId); // Fetch doctor data
+            }
+          }
+        })
+        .then((data) => {
+          if (data) setUserData(data);
+        })
         .catch(() => setUserRole("error"));
     }, []);
 
@@ -166,11 +189,7 @@ const Spa = createVisualComponent({
     }
 
     if (userRole === "error") {
-      return (
-        <Uu5Elements.Text colorScheme="negative">
-          Failed to load user permissions
-        </Uu5Elements.Text>
-      );
+      return <Uu5Elements.Text colorScheme="negative">Failed to load user permissions</Uu5Elements.Text>;
     }
     //Cashing the user role in session storage for future use.
     /*
@@ -182,15 +201,20 @@ const Spa = createVisualComponent({
 
     //@@viewOn:render
     return (
-      <Plus4U5.SpaProvider initialLanguageList={["en"]}>
-        <Uu5Elements.ModalBus>
-          <Plus4U5App.Spa routeMap={createRouteMap(userRole)} />
-        </Uu5Elements.ModalBus>
-      </Plus4U5.SpaProvider>
+      <Plus4U5.RouteDataProvider>
+        <Plus4U5.SpaProvider initialLanguageList={["en"]}>
+          <Uu5Elements.ModalBus>
+            <Plus4U5App.Spa routeMap={createRouteMap(userRole, userData)} />
+          </Uu5Elements.ModalBus>
+        </Plus4U5.SpaProvider>
+      </Plus4U5.RouteDataProvider>
     );
     //@@viewOff:render
   },
 });
+
+// Export the context hook for use in other components
+//export const usePatientData = () => useContext(Plus4U5App.Spa);
 
 //@@viewOn:exports
 export { Spa };
